@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
@@ -8,18 +8,11 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_input = request.json.get("message").lower()
+    user_input = request.json.get("message")
 
-    if "hello" in user_input:
+    if "hello" in user_input.lower():
         reply = "Hi 👋! How can I help you?"
-    elif "your name" in user_input:
-        reply = "I am MCA Chatbot 🤖"
-    elif "course" in user_input:
-        reply = "This chatbot is for MCA students"
     else:
-        reply = "Sorry, I don't understand 😅"
+        reply = "I got your message: " + user_input
 
     return jsonify({"reply": reply})
-
-if __name__ == "__main__":
-    app.run()
