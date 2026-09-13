@@ -1,39 +1,25 @@
-from flask import Flask, request, render_template
-import openai
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-openai.api_key = "YOUR_API_KEY_HERE"
+@app.route("/")
+def home():
+    return render_template("index.html")
 
-chat_history = []
-
-@app.route("/", methods=["GET", "POST"])
+@app.route("/chat", methods=["POST"])
 def chat():
-    global chat_history
+    user_input = request.json.get("message").lower()
 
-    if request.method == "POST":
-        user = request.form["user_input"]
+    if "hello" in user_input:
+        reply = "Hi 👋! How can I help you?"
+    elif "your name" in user_input:
+        reply = "I am MCA Chatbot 🤖"
+    elif "course" in user_input:
+        reply = "This chatbot is for MCA students"
+    else:
+        reply = "Sorry, I don't understand 😅"
 
-        chat_history.append({"role": "user", "content": user})
-
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=chat_history
-            )
-
-            reply = response.choices[0].message["content"]
-
-            chat_history.append({"role": "assistant", "content": reply})
-
-        except Exception as e:
-            reply = "Error: " + str(e)
-
-    return render_template("index.html", chat_history=chat_history)
+    return jsonify({"reply": reply})
 
 if __name__ == "__main__":
-    import os
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run()
